@@ -1,0 +1,18 @@
+{
+    "name": "csv-generator",
+    "version": "1.0.0",
+    "main": "index.js",
+    "repository": "https://github.com/atomicpages/csv-generator.git",
+    "author": "Dennis Thompson <djtthompson@gmail.com>",
+    "license": "MIT",
+    "bin": "./bin/gencsv",
+    "dependencies": {
+        "ascii-table": "^0.0.9",
+        "chalk": "^2.0.1",
+        "chance": "^1.0.10",
+        "clear": "^0.0.1",
+        "figlet": "^1.2.0",
+        "inquirer": "^3.2.1",
+        "yargs": "^8.0.2"
+    }
+}

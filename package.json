@@ -6,13 +6,22 @@
     "author": "Dennis Thompson <djtthompson@gmail.com>",
     "license": "MIT",
     "bin": "./bin/gencsv",
+    "preferGlobal": true,
     "dependencies": {
-        "ascii-table": "^0.0.9",
         "chalk": "^2.0.1",
         "chance": "^1.0.10",
         "clear": "^0.0.1",
+        "cli-table": "^0.3.1",
         "figlet": "^1.2.0",
+        "i18n": "^0.8.3",
         "inquirer": "^3.2.1",
         "yargs": "^8.0.2"
+    },
+    "devDependencies": {
+        "chai": "^4.1.0",
+        "del": "^3.0.0",
+        "gulp": "^3.9.1",
+        "gulp-download2": "^1.0.0",
+        "mocha": "^3.4.2"
     }
 }

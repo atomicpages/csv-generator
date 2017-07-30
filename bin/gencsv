@@ -7,19 +7,23 @@ const Utils = require('../lib/utils');
 
 const argv = require('yargs')
     .command('<file>', 'The output file name')
-    .usage('$0 <file> [columns..] [options]\n$0 <file> [options] < columns.txt', {
-        'chunk': {
+    .usage('$0 [options] <file> [columns..]\n$0 [options] <file> < columns.txt', {
+        chunk: {
             describe: 'The number of rows to generate per pass',
             number: true,
             default: 1000
         },
-        'rows': {
+        functions: {
+            alias: 'func',
+            describe: 'Lists available functions'
+        },
+        rows: {
             alias: 'r',
             describe: 'The number of rows to generate (e.g. 100, 100000, 100k, 1M, 1B, etc.)',
             number: true,
             default: 100
         },
-        'interactive': {
+        interactive: {
             alias: 'i',
             describe: 'Run the script in interactive mode with a series of questions and user-provided answers',
             conflicts: 'clear-settings'
@@ -38,14 +42,31 @@ const argv = require('yargs')
     .version(require('../package.json').version)
     .argv;
 
-if (Utils.isInteractive()) {
-    // TODO: launch interactive mode...
+if (argv.functions) {
+    console.log('Available functions:');
+    Utils.functions(require('../functions'));
     process.exit(0);
 }
 
-if (argv._.length <= 1 && process.stdin.isTTY) {
-    console.log(chalk.redBright('You must define an output file name and at least one column!'));
-    process.exit(1);
+if (argv.c) {
+    console.log('Removing settings...');
+
+    try {
+        fs.unlinkSync(path.resolve(Utils.home(), '.gencsv'));
+        console.log(`Successfully removed ${chalk.cyan(path.resolve(Utils.home(), '.gencsv'))}`);
+
+        if (argv._.length <= 1) {
+            process.exit(0);
+        }
+    } catch (e) {
+        console.log(`Error removing ${chalk.redBright(path.resolve(Utils.home(), '.gencsv'))}`);
+        console.log('Attempting to run command...\n');
+    }
+}
+
+if (Utils.isInteractive() || argv.i) {
+    require('../index');
+    return;
 }
 
 if (argv.a) {
@@ -55,23 +76,15 @@ if (argv.a) {
         }
 
         console.log(`Settings written to ${chalk.cyan(path.resolve(Utils.home(), '.gencsv'))}`);
+        setTimeout(() => require('../index'), 500);
     });
 
-    // TODO: launch in interactive mode
+    return;
 }
 
-if (argv.c) {
-    console.log('Removing settings...');
-
-    fs.unlink(path.resolve(Utils.home(), '.gencsv'), err => {
-        if (err) {
-            throw new Error(err);
-        }
-
-        console.log(`Successfully removed ${chalk.cyan(path.resolve(Utils.home(), '.gencsv'))}`);
-
-        process.exit(0);
-    });
+if (argv._.length <= 1 && process.stdin.isTTY) {
+    console.log(chalk.redBright('You must define an output file name and at least one column!'));
+    process.exit(1);
 }
 
 const outFile = argv._[0];

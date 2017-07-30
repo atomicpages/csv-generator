@@ -58,3 +58,5 @@ yarn.lock
 # dotenv environment variables file
 .env
 
+# TPLs
+vendor/

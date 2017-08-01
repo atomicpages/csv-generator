@@ -3,7 +3,10 @@
 const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
+const _ = require('lodash/string')
+
 const Utils = require('../lib/utils');
+const generator = require('../lib/generator');
 
 const argv = require('yargs')
     .command('<file>', 'The output file name')
@@ -20,8 +23,13 @@ const argv = require('yargs')
         rows: {
             alias: 'r',
             describe: 'The number of rows to generate (e.g. 100, 100000, 100k, 1M, 1B, etc.)',
-            number: true,
             default: 100
+        },
+        'use-headers': {
+            alias: 'h',
+            describe: 'Use this flag to set column headers',
+            boolean: true,
+            default: false
         },
         interactive: {
             alias: 'i',
@@ -31,6 +39,10 @@ const argv = require('yargs')
         'always-interactive': {
             alias: 'a',
             describe: 'Start the script in interactive mode and save this setting',
+            conflicts: 'clear-settings'
+        },
+        'always-use-headers': {
+            describe: 'Use this flag to persist column headers preferences',
             conflicts: 'clear-settings'
         },
         'clear-settings': {
@@ -87,8 +99,36 @@ if (argv._.length <= 1 && process.stdin.isTTY) {
     process.exit(1);
 }
 
+if (Utils.alwaysUseHeaders()) {
+    argv['use-headers'] = true;
+}
+
 const outFile = argv._[0];
-const columns = argv._.slice(1);
+let columns = argv._.slice(1);
+let rows = 100;
+
+if (argv.r !== 100) {
+    if (/^\d+(\.\d*)?(K|M|B)$/.test(argv.r)) {
+        let r = argv.r.toLowerCase().trim();
+
+        if (_.endsWith(r, 'k')) {
+            rows = parseFloat(r) * 1000;
+        } else if (_.endsWith(r, 'm')) {
+            rows = parseFloat(r) * 10 ** 6;
+        } else if (_.endsWith(r, 'b')) {
+            rows = parseFloat(r) * 10 ** 9;
+        }
+    } else {
+        if (!/[1-9]\d*/.test(argv.r)) {
+            console.log(chalk.redBright('Invalid row number'));
+            process.exit(1);
+        }
+
+        rows = parseInt(argv.r);
+    }
+
+    rows = Math.ceil(rows); // drop decimals if any
+}
 
 if (columns.length === 0) {
     let data = '';
@@ -100,15 +140,37 @@ if (columns.length === 0) {
     });
 
     rl.on('line', line => {
-        line += data;
+        data += line;
+        data += '\n';
     }).on('close', () => {
         console.log('Columns definitions received! Validating...');
 
-        // TODO: handle rest of execution...
+        let lines = data.split('\n');
+        let headers = '';
 
-        process.exit(0);
+        if (lines.length > 2) {
+            columns = lines[1].split(/\s*,\s*/);
+            headers = lines[0];
+        } else {
+            columns = lines[0].split(/\s*,\s*/);
+        }
+
+        generate(outFile, columns, {
+            rows: rows,
+            chunks: argv.chunk,
+            headers: argv['use-headers'] || headers.length > 0
+        }, headers.split(/\s*,\s*/));
     });
 } else {
-    // TODO: handle rest of execution...
-    process.exit(0);
+    generate(outFile, columns, {
+        rows: rows,
+        chunks: argv.chunk,
+        headers: argv['use-headers']
+    });
+}
+
+function generate(file, columns, options, headers) {
+    generator(file, columns, options, headers).then(() => {
+        process.exit(0);
+    });
 }

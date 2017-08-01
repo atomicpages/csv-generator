@@ -1,0 +1,2 @@
+id, first_name, last_name, uid, phone, address, city, state, country, zip, promotional_emails, created_at, last_access, date_of_birth, age, amount, email
+seq, first, last, guid, phone, address, city, state, pick(U.S.A), zip, yn, date, date, birthday, age, dollar, email

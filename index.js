@@ -30,7 +30,8 @@ const Utils = require('./lib/utils');
         return true;
     };
 
-    inquirer.prompt([{
+    inquirer.prompt([
+        {
             name: 'file',
             type: 'input',
             message: 'Enter in the name of your output file:',
@@ -43,6 +44,36 @@ const Utils = require('./lib/utils');
                 }
 
                 return true;
+            }
+        },
+        {
+            name: 'use-headers',
+            type: 'list',
+            message: 'Enable column headers?',
+            choices: ['Yes', 'No']
+        },
+        {
+            name: 'custom-headers',
+            type: 'list',
+            message: 'Specify custom column headers?',
+            choices: ['Yes', 'No'],
+            when: function (input) {
+                return input['use-headers'];
+            }
+        },
+        {
+            name: 'headers',
+            message: 'Enter column headers separated by a comma.',
+            type: 'editor',
+            when: function (input) {
+                return input['custom-headers'];
+            },
+            validate: function (input) {
+                // let headers = input.headers.split(/\s*,\s*/);
+
+                // if (headers.length === 0) {
+                //     return 'Invalid column headers';
+                // }
             }
         },
         {

@@ -1,4 +1,3 @@
-const fs = require('fs');
 const chalk = require('chalk');
 const clear = require('clear');
 const figlet = require('figlet');
@@ -21,10 +20,12 @@ const Utils = require('./lib/utils');
     console.log('To show help or list available functions, type "help" or "help functions" at any question and press ENTER');
 
     const help = input => {
-        if (input.toLocaleLowerCase().trim() === 'help') {
-            return 'Testing...';
-        } else if (/^(help\s*)?func(tions?)?$/i.test(input.toLocaleLowerCase().trim())) {
-            return 'Available functions:\n' + Utils.functions(require('./functions'), true);
+        if (typeof input === 'string') {
+            if (input.toLowerCase().trim() === 'help') {
+                return 'Testing...';
+            } else if (/^(help\s*)?func(tions?)?$/i.test(input.toLowerCase().trim())) {
+                return 'Available functions:\n' + Utils.listFunctions(require('./functions'));
+            }
         }
 
         return true;
@@ -58,7 +59,7 @@ const Utils = require('./lib/utils');
             message: 'Specify custom column headers?',
             choices: ['Yes', 'No'],
             when: function (input) {
-                return input['use-headers'];
+                return input['use-headers'] === 'Yes';
             }
         },
         {
@@ -66,14 +67,16 @@ const Utils = require('./lib/utils');
             message: 'Enter column headers separated by a comma.',
             type: 'editor',
             when: function (input) {
-                return input['custom-headers'];
+                return input['custom-headers'] === 'Yes';
             },
             validate: function (input) {
-                // let headers = input.headers.split(/\s*,\s*/);
+                let headers = input.trim().split(/\s*,\s*/);
 
-                // if (headers.length === 0) {
-                //     return 'Invalid column headers';
-                // }
+                if (headers.length === 0) {
+                    return 'Invalid column headers';
+                }
+
+                return true;
             }
         },
         {
@@ -87,7 +90,7 @@ const Utils = require('./lib/utils');
                     return response;
                 }
 
-                if (input.trim().split(/\s*,\s*/g).length === 0) {
+                if (!input || (input && input.trim().split(/\s*,\s*/g).length === 0)) {
                     return 'Invalid column definitions.';
                 }
 
@@ -106,14 +109,20 @@ const Utils = require('./lib/utils');
                     return response;
                 }
 
-                if (!/^[1-9]\d*(B|K|M)?$/.test(input)) {
+                try {
+                    Utils.convertNumber(input);
+                } catch (e) {
                     return 'Invalid number entered. Value must be an integer greater than 0.';
                 }
 
                 return true;
             }
         }
-    ]).then(() => {
-        // TODO: handle this case...
+    ]).then(answers => {
+        Utils.generate(answers.file, answers.columns.split(/\s*,\s*/), {
+            rows: Utils.convertNumber(answers.rows),
+            chunks: 1000,
+            headers: answers['use-headers'] === 'Yes'
+        }, Array.isArray(answers.headers) ? answers.headers.split(/\s*,\s*/) : []);
     });
 }());

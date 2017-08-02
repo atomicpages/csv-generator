@@ -95,6 +95,7 @@ Options:
                             setting
   --always-use-headers      Use this flag to persist column headers preferences
   --clear-settings, -c      Clear always-interactive settings
+  --quiet, -q               Silence console output    [boolean] [default: false]
   --help                    Show help                                  [boolean]
   --version                 Show version number                        [boolean]
 ```
@@ -148,7 +149,7 @@ We can define our tables two ways:
     ```
 
 ### Performance Notes
-By nature, some functions are substantially slower than others, specifically:
+By nature, some functions are considerably slower than others, for example:
 
 | Function | Time to Write 10K Rows by 100 Columns |
 | :---: | :---: |
@@ -168,7 +169,7 @@ by contrast, these functions are much faster:
 | `zip` | 2.579 |
 | `yn` | 0.706s |
 
-If you need to generate large amounts of data for _wide_ tables, it's recommended to use small pieces of data to speed up the process.
+If you need to generate large amounts of data for _wide_ tables, it's recommended to use fast functions.
 
 #### More Notes
 Instead of hundreds of async file writes (i.e. page faults), this generator uses a single stream to write content to the file. The trade-off is normal heap space, less CPU involvement, but more virtual memory used &mdash; memory is cheap; transistors aren't.
@@ -177,7 +178,7 @@ Instead of hundreds of async file writes (i.e. page faults), this generator uses
 This tool uses some scripts that are copyright of [Data Design Group Inc.](http://www.ddginc-usa.com/) For more information see the README file in `lib/vendor`.
 
 ### Developers
-Want to add a feature? Need to debug? The `readline` interface makes for cumbersome debugging, but node has our back:
+Want to add a feature? Have a useful generator? Need to debug? The `readline` interface makes for cumbersome debugging, but node has our back:
 
 ```bash
 node --inspect --inspect-brk index.js
@@ -193,4 +194,19 @@ open up Google Chrome and navigate to:
 
 ```
 chrome://inspect
+```
+
+### Running Tests
+To run unit tests:
+
+```bash
+npm run test # or
+yarn test
+```
+
+To run e2e tests:
+
+```bash
+npm run e2e # or
+yarn e2e
 ```

@@ -3,9 +3,9 @@
 const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
-const _ = require('lodash/string')
 
 const Utils = require('../lib/utils');
+const Preferences = require('../lib/preferences');
 const generator = require('../lib/generator');
 
 const argv = require('yargs')
@@ -48,6 +48,12 @@ const argv = require('yargs')
         'clear-settings': {
             alias: 'c',
             describe: 'Clear always-interactive settings'
+        },
+        quiet: {
+            alias: 'q',
+            describe: 'Silence console output',
+            boolean: true,
+            default: false
         }
     })
     .help()
@@ -63,31 +69,29 @@ if (argv.functions) {
 if (argv.c) {
     console.log('Removing settings...');
 
-    try {
-        fs.unlinkSync(path.resolve(Utils.home(), '.gencsv'));
-        console.log(`Successfully removed ${chalk.cyan(path.resolve(Utils.home(), '.gencsv'))}`);
+    Preferences.truncate(
+        () => {
+            console.log(`Successfully removed ${chalk.cyan(Preferences.file())}`);
 
-        if (argv._.length <= 1) {
-            process.exit(0);
+            if (argv._.length <= 1) {
+                process.exit(0);
+            }
+        },
+        () => {
+            console.log(`Error removing ${chalk.redBright(Preferences.file())}`);
+            console.log('Attempting to run command...\n');
         }
-    } catch (e) {
-        console.log(`Error removing ${chalk.redBright(path.resolve(Utils.home(), '.gencsv'))}`);
-        console.log('Attempting to run command...\n');
-    }
+    )
 }
 
-if (Utils.isInteractive() || argv.i) {
+if (Preferences.isInteractive() || argv.i) {
     require('../index');
     return;
 }
 
 if (argv.a) {
-    fs.writeFile(path.resolve(Utils.home(), '.gencsv'), '{ "interactive": true }', err => {
-        if (err) {
-            throw new Error(err);
-        }
-
-        console.log(`Settings written to ${chalk.cyan(path.resolve(Utils.home(), '.gencsv'))}`);
+    Preferences.save('interactive', true, () => {
+        console.log(`Settings written to ${chalk.cyan(Preferences.file())}`);
         setTimeout(() => require('../index'), 500);
     });
 
@@ -95,11 +99,11 @@ if (argv.a) {
 }
 
 if (argv._.length <= 1 && process.stdin.isTTY) {
-    console.log(chalk.redBright('You must define an output file name and at least one column!'));
+    console.log(chalk.redBright('You must define an output file name and at least one column definition!'));
     process.exit(1);
 }
 
-if (Utils.alwaysUseHeaders()) {
+if (Preferences.alwaysUseHeaders()) {
     argv['use-headers'] = true;
 }
 
@@ -108,26 +112,12 @@ let columns = argv._.slice(1);
 let rows = 100;
 
 if (argv.r !== 100) {
-    if (/^\d+(\.\d*)?(K|M|B)$/.test(argv.r)) {
-        let r = argv.r.toLowerCase().trim();
-
-        if (_.endsWith(r, 'k')) {
-            rows = parseFloat(r) * 1000;
-        } else if (_.endsWith(r, 'm')) {
-            rows = parseFloat(r) * 10 ** 6;
-        } else if (_.endsWith(r, 'b')) {
-            rows = parseFloat(r) * 10 ** 9;
-        }
-    } else {
-        if (!/[1-9]\d*/.test(argv.r)) {
-            console.log(chalk.redBright('Invalid row number'));
-            process.exit(1);
-        }
-
-        rows = parseInt(argv.r);
+    try {
+        rows = Utils.convertNumber(argv.r);
+    } catch (e) {
+        console.log(chalk.redBright('Invalid row number'));
+        process.exit(1);
     }
-
-    rows = Math.ceil(rows); // drop decimals if any
 }
 
 if (columns.length === 0) {
@@ -143,7 +133,9 @@ if (columns.length === 0) {
         data += line;
         data += '\n';
     }).on('close', () => {
-        console.log('Columns definitions received! Validating...');
+        if (!argv.q) {
+            console.log('Columns definitions received! Validating...');
+        }
 
         let lines = data.split('\n');
         let headers = '';
@@ -155,22 +147,18 @@ if (columns.length === 0) {
             columns = lines[0].split(/\s*,\s*/);
         }
 
-        generate(outFile, columns, {
+        Utils.generate(outFile, columns, {
             rows: rows,
             chunks: argv.chunk,
-            headers: argv['use-headers'] || headers.length > 0
+            headers: argv['use-headers'] || headers.length > 0,
+            quiet: argv.quiet
         }, headers.split(/\s*,\s*/));
     });
 } else {
-    generate(outFile, columns, {
+    Utils.generate(outFile, columns, {
         rows: rows,
         chunks: argv.chunk,
-        headers: argv['use-headers']
-    });
-}
-
-function generate(file, columns, options, headers) {
-    generator(file, columns, options, headers).then(() => {
-        process.exit(0);
+        headers: argv['use-headers'],
+        quiet: argv.quiet
     });
 }

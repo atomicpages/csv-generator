@@ -49,9 +49,9 @@ const argv = require('yargs')
             alias: 'c',
             describe: 'Clear always-interactive settings'
         },
-        quiet: {
-            alias: 'q',
-            describe: 'Silence console output',
+        silent: {
+            alias: 's',
+            describe: 'Minimal console output',
             boolean: true,
             default: false
         }
@@ -151,7 +151,7 @@ if (columns.length === 0) {
             rows: rows,
             chunks: argv.chunk,
             headers: argv['use-headers'] || headers.length > 0,
-            quiet: argv.quiet
+            silent: argv.silent
         }, headers.split(/\s*,\s*/));
     });
 } else {
@@ -159,6 +159,6 @@ if (columns.length === 0) {
         rows: rows,
         chunks: argv.chunk,
         headers: argv['use-headers'],
-        quiet: argv.quiet
+        silent: argv.silent
     });
 }

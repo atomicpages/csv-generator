@@ -10,10 +10,15 @@ describe('testing preferences class', function () {
         it('should be undefined', function () {
             expect(Preferences.isInteractive()).to.be.false;
         });
+
+        it('should be false', function () {
+            Preferences._preferences = { interactive: false };
+            expect(Preferences.isInteractive()).to.be.false;
+        });
     });
 
     describe('#alwaysUseHeaders', function () {
-        it('should be udnefined', function () {
+        it('should be undefined', function () {
             expect(Preferences.alwaysUseHeaders()).to.be.false;
         });
     });
@@ -27,8 +32,7 @@ describe('testing preferences class', function () {
     describe('#save', function () {
         beforeEach(function () {
             const config = {};
-            config[Preferences.file()] = '';
-
+            config[Preferences.file()] = '{"foo": true}';
             mock(config);
         });
 
@@ -53,6 +57,86 @@ describe('testing preferences class', function () {
                 expect(console.log.calledOnce).to.be.true;
                 spy.restore();
             });
+        });
+
+        it('should read preferences written to disk', function () {
+            Preferences._preferences = null; // mock-fs is persisting options after it blocks; fake it
+            Preferences.save('bar', true);
+
+            fs.readFile(Preferences.file(), (err, data) => {
+                expect(data).to.deep.equal({
+                    foo: true,
+                    bar: true
+                });
+            });
+        });
+
+        it('should save when no options are saved on disk', function () {
+            Preferences.truncate(() => {
+                Preferences._preferences = null;
+                Preferences.save('bar', true);
+
+                fs.readFile(Preferences.file(), (err, data) => {
+                    expect(data).to.deep.equal({ bar: true });
+                });
+            }, () => {
+                expect.fail('An error occurred truncating persisted settings. Unable to test properly.');
+            });
+        });
+    });
+
+    describe('#truncate', function () {
+        describe('#truncate with mock-fs', function () {
+            beforeEach(function () {
+                const config = {};
+                config[Preferences.file()] = '';
+                mock(config);
+            });
+
+            afterEach(function () {
+                mock.restore();
+            });
+
+            it('should remove all saved options', function () {
+                Preferences.save('always-use-headers', true);
+                Preferences.truncate();
+
+                fs.readFile(Preferences.file(), (err, data) => {
+                    expect(err).to.not.be.null;
+                    expect(err).to.not.be.undefined;
+                    expect(err).to.have.own.property('code');
+                    expect(err).to.have.own.property('code', 'ENOENT');
+                    expect(data).to.be.undefined;
+                });
+            });
+
+            it('should execute success callback after unlinking file', function () {
+                let spy = this.sinon.spy(console, 'log');
+
+                Preferences.save('always-use-headers', true);
+                Preferences.truncate(() => console.log('foo'));
+
+                expect(console.log.calledOnce).to.be.true;
+                // spy.should.have.been.calledWithMatch('foo');
+
+                spy.restore();
+            });
+        });
+
+        it('should execute error callback when settings file is not defined', function () {
+            let spy = this.sinon.spy(console, 'log');
+
+            Preferences.truncate(null, () => {
+                console.log('foo');
+            });
+
+            expect(console.log.calledOnce).to.be.true;
+
+            spy.restore();
+        });
+
+        it('should not throw if no callback is defined', function () {
+            expect(Preferences.truncate).to.not.throw();
         });
     });
 });

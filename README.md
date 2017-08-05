@@ -95,7 +95,7 @@ Options:
                             setting
   --always-use-headers      Use this flag to persist column headers preferences
   --clear-settings, -c      Clear always-interactive settings
-  --quiet, -q               Silence console output    [boolean] [default: false]
+  --silent, -s              Minimal console output    [boolean] [default: false]
   --help                    Show help                                  [boolean]
   --version                 Show version number                        [boolean]
 ```

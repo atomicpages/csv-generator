@@ -9,7 +9,7 @@
 			"request": "launch",
 			"name": "Tests",
             "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
-            "stopOnEntry": true,
+            "stopOnEntry": false,
             "args": ["test/*.test.js"],
             "cwd": "${workspaceRoot}",
             "runtimeExecutable": null

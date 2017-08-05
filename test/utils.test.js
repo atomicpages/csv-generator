@@ -3,6 +3,8 @@
 const stripAnsi = require('strip-ansi');
 const expect = require('chai').expect;
 const Utils = require('../lib/utils');
+const mock = require('mock-fs');
+
 require('mocha-sinon');
 
 describe('Testing the Utils class', function () {
@@ -40,6 +42,18 @@ describe('Testing the Utils class', function () {
             expect(table).to.have.string('name(2)');
             expect(table).to.have.string('My desc');
         });
+
+        it('should only add strings and objects of the right format', function () {
+            const table = Utils.listFunctions({
+                name: 0,
+                email: 'This is a test',
+                address: 'This is a test'
+            });
+
+            expect(table).to.not.have.string('name');
+            expect(table).to.have.string('email');
+            expect(table).to.have.string('address');
+        });
     });
 
     describe('#functions', function () {
@@ -61,6 +75,16 @@ describe('Testing the Utils class', function () {
     describe('#convertNumber', function () {
         it('should throw an exception on invalid input', function () {
             expect(Utils.convertNumber).to.throw(Error);
+        });
+
+        // TODO: fix this
+        it.skip('should throw an exception when conversion character is unsupported', function () {
+            const result = Utils.convertNumber('10T');
+            expect(result).to.throw(Error);
+        });
+
+        it('should not change 100', function () {
+            expect(Utils.convertNumber('100')).to.equal(100);
         });
 
         it('should convert 10K to 10000', function () {
@@ -100,5 +124,19 @@ describe('Testing the Utils class', function () {
         });
     });
 
-    // describe('#generate', function () { });
+    describe('#generate', function () {
+        it('should call generate without an exception', function (done) {
+            mock();
+
+            const generate = Utils.generate('foo.csv', ['name'], {
+                rows: 1,
+                chunks: 1,
+                silent: true
+            }).then(function () {
+                expect(generate).to.not.throw;
+                mock.restore();
+                done();
+            });
+        });
+    });
 });

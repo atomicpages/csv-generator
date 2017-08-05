@@ -8,8 +8,8 @@
     "bin": "./bin/gencsv",
     "preferGlobal": true,
     "scripts": {
-        "test": "nyc mocha --bail | coveralls",
-        "prepublish": "",
+        "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+        "coverage": "nyc mocha --bail",
         "lint": "./node_modules/.bin/eslint --max-warnings 1 **/*.js",
         "e2e": ""
     },
@@ -34,6 +34,7 @@
         "eslint-plugin-chai-expect": "^1.1.1",
         "eslint-plugin-mocha": "^4.11.0",
         "eslint-plugin-promise": "^3.5.0",
+        "istanbul": "^0.4.5",
         "mocha": "^3.4.2",
         "mocha-lcov-reporter": "^1.3.0",
         "mocha-sinon": "^2.0.0",
@@ -54,8 +55,7 @@
         ],
         "reporter": [
             "text",
-            "html",
-            "text-lcov"
+            "html"
         ],
         "check-coverage": true,
         "per-file": true,

@@ -1,0 +1,12 @@
+instrumentation:
+    root: .
+    extensions:
+        - .js
+    default-excludes: true
+    excludes:
+        - "**/vendor/**/*.js"
+        - test
+        - test{,-*}.js
+        - "**/*.test.js"
+        - "**/__tests__/**"
+        - "**/node_modules/**"

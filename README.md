@@ -1,7 +1,7 @@
 CSV Generator
 =============
 
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![Build Status](https://travis-ci.org/atomicpages/csv-generator.svg?branch=master)](https://travis-ci.org/atomicpages/csv-generator) [![Coverage Status](https://coveralls.io/repos/github/atomicpages/csv-generator/badge.svg?branch=master)](https://coveralls.io/github/atomicpages/csv-generator?branch=master) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 A simple-to-use script for generating CSV files with hundreds of columns and billions of rows.
 

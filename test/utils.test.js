@@ -1,5 +1,7 @@
 /* eslint-disable dot-notation, no-invalid-this */
 
+'use strict';
+
 const stripAnsi = require('strip-ansi');
 const expect = require('chai').expect;
 const Utils = require('../lib/utils');

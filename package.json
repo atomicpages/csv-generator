@@ -14,9 +14,10 @@
         "e2e": ""
     },
     "engines": {
-        "node": ">= 6.11.1"
+        "node": ">= 4.8.2"
     },
     "dependencies": {
+        "asyncawait": "^1.0.6",
         "chalk": "^2.0.1",
         "chance": "^1.0.10",
         "clear": "^0.0.1",

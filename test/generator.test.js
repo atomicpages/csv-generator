@@ -1,5 +1,7 @@
 /* eslint-disable dot-notation, no-invalid-this */
 
+'use strict';
+
 const fs = require('fs');
 const expect = require('chai').expect;
 const mock = require('mock-fs');

@@ -1,6 +1,8 @@
 CSV Generator
 =============
 
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
 A simple-to-use script for generating CSV files with hundreds of columns and billions of rows.
 
 ### Installation

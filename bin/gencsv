@@ -7,51 +7,58 @@ const chalk = require('chalk');
 const Utils = require('../lib/utils');
 const Preferences = require('../lib/preferences');
 const generator = require('../lib/generator');
+const i18n = require('i18n');
 
-const argv = require('yargs')
-    .command('<file>', 'The output file name')
+i18n.configure({
+    locales: ['en', 'de'],
+    directory: `${__dirname}/locales`
+});
+
+const yargs = require('yargs');
+const argv = yargs
+    .command('<file>', i18n.__('The output file name'))
     .usage('$0 [options] <file> [columns..]\n$0 [options] <file> < columns.txt', {
         chunk: {
-            describe: 'The number of rows to generate per pass',
+            describe: i18n.__('The number of rows to generate per pass'),
             number: true,
             default: 1000
         },
         functions: {
             alias: 'func',
-            describe: 'Lists available functions'
+            describe: i18n.__('Lists available functions')
         },
         rows: {
             alias: 'r',
-            describe: 'The number of rows to generate (e.g. 100, 100000, 100k, 1M, 1B, etc.)',
+            describe: i18n.__('The number of rows to generate (e.g. 100, 100000, 100k, 1M, 1B, etc.)'),
             default: 100
         },
         'use-headers': {
             alias: 'h',
-            describe: 'Use this flag to set column headers',
+            describe: i18n.__('Use this flag to set column headers'),
             boolean: true,
             default: false
         },
         interactive: {
             alias: 'i',
-            describe: 'Run the script in interactive mode with a series of questions and user-provided answers',
+            describe: i18n.__('Run the script in interactive mode with a series of questions and user-provided answers'),
             conflicts: 'clear-settings'
         },
         'always-interactive': {
             alias: 'a',
-            describe: 'Start the script in interactive mode and save this setting',
+            describe: i18n.__('Start the script in interactive mode and save this setting'),
             conflicts: 'clear-settings'
         },
         'always-use-headers': {
-            describe: 'Use this flag to persist column headers preferences',
+            describe: i18n.__('Use this flag to persist column headers preferences'),
             conflicts: 'clear-settings'
         },
         'clear-settings': {
             alias: 'c',
-            describe: 'Clear always-interactive settings'
+            describe: i18n.__('Clear always-interactive settings')
         },
         silent: {
             alias: 's',
-            describe: 'Minimal console output',
+            describe: i18n.__('Minimal console output'),
             boolean: true,
             default: false
         }
@@ -60,26 +67,32 @@ const argv = require('yargs')
     .version(require('../package.json').version)
     .argv;
 
+const showHelp = message => {
+    console.log(`${chalk.redBright(`${message}`)}\n${i18n.__('Usage')}:`);
+    yargs.showHelp();
+    process.exit(1);
+};
+
 if (argv.functions) {
-    console.log('Available functions:');
+    console.log(`${i18n.__('Available functions')}:`);
     Utils.functions(require('../functions'));
     process.exit(0);
 }
 
 if (argv.c) {
-    console.log('Removing settings...');
+    console.log(`${i18n.__('Removing settings')}...`);
 
     Preferences.truncate(
         () => {
-            console.log(`Successfully removed ${chalk.cyan(Preferences.file())}`);
+            console.log(`${i18n.__('Successfully removed')} ${chalk.cyan(Preferences.file())}`);
 
             if (argv._.length <= 1) {
                 process.exit(0);
             }
         },
         () => {
-            console.log(`Error removing ${chalk.redBright(Preferences.file())}`);
-            console.log('Attempting to run command...\n');
+            console.log(`${i18n.__('Error removing')} ${chalk.redBright(Preferences.file())}`);
+            console.log(`${i18n.__('Attempting to run command')}...\n`);
         }
     )
 }
@@ -91,7 +104,7 @@ if (Preferences.isInteractive() || argv.i) {
 
 if (argv.a) {
     Preferences.save('interactive', true, () => {
-        console.log(`Settings written to ${chalk.cyan(Preferences.file())}`);
+        console.log(`${i18n.__('Settings written to')} ${chalk.cyan(Preferences.file())}`);
         setTimeout(() => require('../index'), 500);
     });
 
@@ -99,7 +112,7 @@ if (argv.a) {
 }
 
 if (argv._.length <= 1 && process.stdin.isTTY) {
-    console.log(chalk.redBright('You must define an output file name and at least one column definition!'));
+    console.log(chalk.redBright(`${i18n.__('You must define an output file name and at least one column definition!')}`));
     process.exit(1);
 }
 
@@ -111,11 +124,19 @@ const outFile = argv._[0];
 let columns = argv._.slice(1);
 let rows = 100;
 
+if (!outFile) {
+    showHelp(i18n.__('Output file must be defined!'));
+} else {
+    if (!/^\.?[a-zA-Z0-9\.-_]+(\.\w+)?$/.test(outFile)) {
+        showHelp(`${i18n.__('Output file cannot end in a special character. Did you forget to add the output file?')}\n`);
+    }
+}
+
 if (argv.r !== 100) {
     try {
         rows = Utils.convertNumber(argv.r);
     } catch (e) {
-        console.log(chalk.redBright('Invalid row number'));
+        console.log(chalk.redBright(i18n.__('Invalid row number')));
         process.exit(1);
     }
 }
@@ -134,7 +155,7 @@ if (columns.length === 0) {
         data += '\n';
     }).on('close', () => {
         if (!argv.q) {
-            console.log('Columns definitions received! Validating...');
+            console.log(`${i18n.__('Columns definitions received! Validating')}...`);
         }
 
         let lines = data.split('\n');

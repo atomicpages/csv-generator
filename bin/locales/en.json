@@ -1,0 +1,14 @@
+{
+	"OUTPUTFILE_COMMAND": "OUTPUTFILE_COMMAND",
+	"OUT_FILE_COMMAND": "OUT_FILE_COMMAND",
+	"The output file name": "The output file name",
+	"The number of rows to generate per pass": "The number of rows to generate per pass",
+	"Lists available functions": "Lists available functions",
+	"The number of rows to generate (e.g. 100, 100000, 100k, 1M, 1B, etc.)": "The number of rows to generate (e.g. 100, 100000, 100k, 1M, 1B, etc.)",
+	"Use this flag to set column headers": "Use this flag to set column headers",
+	"Run the script in interactive mode with a series of questions and user-provided answers": "Run the script in interactive mode with a series of questions and user-provided answers",
+	"Start the script in interactive mode and save this setting": "Start the script in interactive mode and save this setting",
+	"Use this flag to persist column headers preferences": "Use this flag to persist column headers preferences",
+	"Clear always-interactive settings": "Clear always-interactive settings",
+	"Minimal console output": "Minimal console output"
+}

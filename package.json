@@ -1,6 +1,6 @@
 {
     "name": "csv-generator",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "main": "index.js",
     "repository": "https://github.com/atomicpages/csv-generator.git",
     "author": "Dennis Thompson <djtthompson@gmail.com>",
@@ -10,7 +10,7 @@
     "scripts": {
         "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
         "coverage": "nyc mocha --bail",
-        "lint": "./node_modules/.bin/eslint --max-warnings 1 **/*.js",
+        "lint": "./node_modules/.bin/eslint --max-warnings 2 **/*.js",
         "e2e": ""
     },
     "engines": {
@@ -26,6 +26,7 @@
         "i18n": "^0.8.3",
         "inquirer": "^3.2.1",
         "lodash": "^4.17.4",
+        "progress": "^2.0.0",
         "yargs": "^8.0.2"
     },
     "devDependencies": {

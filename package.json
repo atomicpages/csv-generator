@@ -1,6 +1,6 @@
 {
     "name": "csv-generator",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "main": "index.js",
     "repository": "https://github.com/atomicpages/csv-generator.git",
     "author": "Dennis Thompson <djtthompson@gmail.com>",

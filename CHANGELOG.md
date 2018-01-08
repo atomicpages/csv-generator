@@ -1,5 +1,33 @@
+### 1.0.2
+* Fixing clerical error in README
+* Bumping node module versions
+* Adding API docs
+* Removing e2e tests since they're not complete
+* Removing `asyncawait` plugin
+* Disabling `dot-location` rule in ESLint
+* Setting `ecmaVersion` to 2017 in ESLint
+* using real `async/await` in `utils.js` now
+* Exposing API publicly
+
+    ```js
+    const gencsv = require('csv-generator');
+
+    gencsv('foo.csv', ['name'], {
+        rows: 100,
+        chunks: 10,
+        silent: true
+    }).then(
+        res => {
+            console.log(res);
+        },
+        e => {
+            console.error(e);
+        }
+    );
+    ```
+
 ### 1.0.1
-* Adding e2e tests
+* ~~Adding e2e tests~~
 * Adding localizations
 * Adding linting to travis build
 * Fixing fatal exception when output file is missing for CLI interface

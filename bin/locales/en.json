@@ -10,5 +10,7 @@
 	"Start the script in interactive mode and save this setting": "Start the script in interactive mode and save this setting",
 	"Use this flag to persist column headers preferences": "Use this flag to persist column headers preferences",
 	"Clear always-interactive settings": "Clear always-interactive settings",
-	"Minimal console output": "Minimal console output"
+	"Minimal console output": "Minimal console output",
+	"You must define an output file name and at least one column definition!": "You must define an output file name and at least one column definition!",
+	"Invalid row number": "Invalid row number"
 }

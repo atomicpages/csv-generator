@@ -1,16 +1,13 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
 const chalk = require('chalk');
+const i18n = require('i18n');
 
 const Utils = require('../lib/utils');
 const Preferences = require('../lib/preferences');
-const generator = require('../lib/generator');
-const i18n = require('i18n');
 
 i18n.configure({
-    locales: ['en', 'de'],
+    locales: ['en'],
     directory: `${__dirname}/locales`
 });
 
@@ -94,92 +91,98 @@ if (argv.c) {
             console.log(`${i18n.__('Error removing')} ${chalk.redBright(Preferences.file())}`);
             console.log(`${i18n.__('Attempting to run command')}...\n`);
         }
-    )
+    );
 }
 
 if (Preferences.isInteractive() || argv.i) {
     require('../index');
-    return;
-}
-
-if (argv.a) {
+} else if (argv.a) {
     Preferences.save('interactive', true, () => {
         console.log(`${i18n.__('Settings written to')} ${chalk.cyan(Preferences.file())}`);
         setTimeout(() => require('../index'), 500);
     });
-
-    return;
-}
-
-if (argv._.length <= 1 && process.stdin.isTTY) {
-    console.log(chalk.redBright(`${i18n.__('You must define an output file name and at least one column definition!')}`));
-    process.exit(1);
-}
-
-if (Preferences.alwaysUseHeaders()) {
-    argv['use-headers'] = true;
-}
-
-const outFile = argv._[0];
-let columns = argv._.slice(1);
-let rows = 100;
-
-if (!outFile) {
-    showHelp(i18n.__('Output file must be defined!'));
 } else {
-    if (!/^\.?[a-zA-Z0-9\.-_]+(\.\w+)?$/.test(outFile)) {
-        showHelp(`${i18n.__('Output file cannot end in a special character. Did you forget to add the output file?')}\n`);
-    }
-}
-
-if (argv.r !== 100) {
-    try {
-        rows = Utils.convertNumber(argv.r);
-    } catch (e) {
-        console.log(chalk.redBright(i18n.__('Invalid row number')));
+    if (argv._.length <= 1 && process.stdin.isTTY) {
+        console.log(chalk.redBright(`${i18n.__('You must define an output file name and at least one column definition!')}`));
         process.exit(1);
     }
-}
 
-if (columns.length === 0) {
-    let data = '';
+    if (Preferences.alwaysUseHeaders()) {
+        argv['use-headers'] = true;
+    }
 
-    const rl = require('readline').createInterface({
-        input: process.stdin,
-        output: process.stdout,
-        terminal: false
-    });
+    const outFile = argv._[0];
+    let columns = argv._.slice(1);
 
-    rl.on('line', line => {
-        data += line;
-        data += '\n';
-    }).on('close', () => {
-        if (!argv.q) {
-            console.log(`${i18n.__('Columns definitions received! Validating')}...`);
+    if (columns.length === 1) {
+        try {
+            const newCols = columns[0].split(' ');
+
+            if (newCols.length > columns.length) {
+                columns = newCols;
+            }
+        } catch (e) {
+            console.warn(e);
         }
+    }
 
-        let lines = data.split('\n');
-        let headers = '';
+    let rows = 100;
 
-        if (lines.length > 2) {
-            columns = lines[1].split(/\s*,\s*/);
-            headers = lines[0];
-        } else {
-            columns = lines[0].split(/\s*,\s*/);
+    if (!outFile) {
+        showHelp(i18n.__('Output file must be defined!'));
+    } else if (!/^\.?[a-zA-Z0-9\.-_]+(\.\w+)?$/.test(outFile)) {
+        showHelp(`${i18n.__('Output file cannot end in a special character. Did you forget to add the output file?')}\n`);
+    }
+
+    if (argv.r !== 100) {
+        try {
+            rows = Utils.convertNumber(argv.r);
+        } catch (e) {
+            console.log(chalk.redBright(i18n.__('Invalid row number')));
+            process.exit(1);
         }
+    }
 
+    if (columns.length === 0) {
+        let data = '';
+
+        const rl = require('readline').createInterface({
+            input: process.stdin,
+            output: process.stdout,
+            terminal: false
+        });
+
+        rl.on('line', line => {
+            data += line;
+            data += '\n';
+        }).on('close', () => {
+            if (!argv.q) {
+                console.log(`${i18n.__('Columns definitions received! Validating')}...`);
+            }
+
+            let lines = data.split('\n');
+            let headers = '';
+
+            if (lines.length > 2) {
+                columns = lines[1].split(/\s*,\s*/);
+                headers = lines[0];
+            } else {
+                columns = lines[0].split(/\s*,\s*/);
+            }
+
+            Utils.generate(outFile, columns, {
+                rows: rows,
+                chunks: argv.chunk,
+                headers: argv['use-headers'] || headers.length > 0,
+                silent: argv.silent
+            }, headers.split(/\s*,\s*/));
+        });
+    } else {
         Utils.generate(outFile, columns, {
             rows: rows,
             chunks: argv.chunk,
-            headers: argv['use-headers'] || headers.length > 0,
+            headers: argv['use-headers'],
             silent: argv.silent
-        }, headers.split(/\s*,\s*/));
-    });
-} else {
-    Utils.generate(outFile, columns, {
-        rows: rows,
-        chunks: argv.chunk,
-        headers: argv['use-headers'],
-        silent: argv.silent
-    });
+        });
+    }
 }

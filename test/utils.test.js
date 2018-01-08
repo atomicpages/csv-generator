@@ -79,10 +79,13 @@ describe('Testing the Utils class', function () {
             expect(Utils.convertNumber).to.throw(Error);
         });
 
-        // TODO: fix this
-        it.skip('should throw an exception when conversion character is unsupported', function () {
-            const result = Utils.convertNumber('10T');
-            expect(result).to.throw(Error);
+        it('should throw an exception when conversion character is unsupported', function () {
+            try {
+                Utils.convertNumber('10T');
+            } catch (e) {
+                expect(e).to.be.an.instanceof(Error);
+                expect(e.message).to.equal('Invalid number');
+            }
         });
 
         it('should not change 100', function () {

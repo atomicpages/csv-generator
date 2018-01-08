@@ -9,8 +9,8 @@ A simple-to-use script for generating CSV files with hundreds of columns and bil
 To install globally:
 
 ```bash
-npm i -g gencsv # or yarn
-yarn global add gencsv
+npm i -g csv-generator # or yarn
+yarn global add csv-generator
 ```
 
 Since the command is on our global path, we can execute via:
@@ -22,8 +22,8 @@ gencsv --help
 you can also install locally:
 
 ```bash
-npm i gencsv
-yarn add gencsv
+npm i csv-generator
+yarn add csv-generator
 ```
 
 we can run locally:
@@ -32,18 +32,19 @@ we can run locally:
 ./node_modules/.bin/gencsv --help
 ```
 
-You can set a symlink to your project root also:
+You can set a soft link to your project root also:
 
 ```bash
-ln gencsv ./node_modules/.bin/gencsv
+ln -s gencsv ./node_modules/.bin/gencsv
 ./gencsv --help
 ```
 
 ### Usage
-You can use this script in two modes:
+You can use this script in three ways:
 
 * Interactive CLI Interface
 * CLI Interface
+* API (used for embedding in your other scripts/modules)
 
 #### Interactive Interface
 The interactive interface is a series of questions and answers. This interface is not the default interface for this tool, but we can launch it via:
@@ -109,7 +110,8 @@ We can define our tables two ways:
     When issuing the command, be sure to separate functions by **space** &mdash; other delimiters are not supported with this method of entry.
 
     ```bash
-    gencsv foo.csv name email ccnumber date\(2\) pick\(a\|b) # escape special BASH characters
+    gencsv foo.csv 'name email ccnumber date(2) pick(a|b)' # quote the argument to avoid escaping
+    gencsv foo.csv name email ccnumber date\(2\) pick\(a\|b\) # or escape special BASH characters
     ```
 
     This will generate a `.csv` file in our current working directory with five columns and 100 rows.
@@ -117,8 +119,8 @@ We can define our tables two ways:
     Need more rows? Need a lot of rows? No problem.
 
     ```bash
-    gencsv foo.csv -r 100K name email ccnumber date\(2\) pick\(AWS|\Azure\|Google Cloud\|Digital Ocean) # or
-    gencsv foo.csv -r 100000 name email ccnumber date\(2\) pick\(AWS|\Azure\|Google Cloud\|Digital Ocean)
+    gencsv foo.csv -r 100K 'name email ccnumber date(2) pick(AWS|Azure|Google Cloud|Digital Ocean)' # or
+    gencsv foo.csv -r 100000 'name email ccnumber date(2) pick(AWS|Azure|Google Cloud|Digital Ocean)'
     ```
 
     Same table, but this time with 100,000 rows!
@@ -128,6 +130,12 @@ We can define our tables two ways:
     * `K` += 10^3 (e.g. 80K)
     * `M` += 10^6 (e.g. 0.2M)
     * `B` += 10^9 (e.g 2.13B)
+
+    Want to interpolate BASH variables? Use double quotes:
+
+    ```bash
+    gencsv foo.csv "name email ccnumber date(2) pick($USER|b)"
+    ```
 
 2. Columns definition as plain text
 
@@ -150,6 +158,26 @@ We can define our tables two ways:
     name, email, ccnumber, birthday, date, ...
     ```
 
+#### API Interface
+What's that? An API? Yes. As of 1.0.2 you can `require` `csv-generator` in your node app:
+
+```js
+const gencsv = require('csv-generator');
+
+gencsv('foo.csv', ['name'], {
+    rows: 100,
+    chunks: 10,
+    silent: true
+}).then(
+    res => {
+        console.log(res);
+    },
+    e => {
+        console.error(e);
+    }
+);
+```
+
 ### Performance Notes
 By nature, some functions are considerably slower than others, for example:
 
@@ -171,7 +199,7 @@ by contrast, these functions are much faster:
 | `zip` | 2.579 |
 | `yn` | 0.706s |
 
-If you need to generate large amounts of data for _wide_ tables, it's recommended to use fast functions.
+If you need to generate large amounts of data for _wide_ tables it is recommended to use fast functions.
 
 #### More Notes
 Instead of hundreds of async file writes (i.e. page faults), this generator uses a single stream to write content to the file. The trade-off is normal heap space, less CPU involvement, but more virtual memory used &mdash; memory is cheap; transistors aren't.
@@ -202,13 +230,6 @@ chrome://inspect
 To run unit tests:
 
 ```bash
-npm run test # or
-yarn test
-```
-
-To run e2e tests:
-
-```bash
-npm run e2e # or
-yarn e2e
+npm run coverage # or
+yarn coverage
 ```

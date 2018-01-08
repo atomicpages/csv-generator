@@ -26,6 +26,66 @@ describe('testing generator', function () {
             mock.restore();
         });
 
+        it('should throw an error when no name is provided', function () {
+            try {
+                generator('', columns, null);
+            } catch (e) {
+                expect(e).to.be.an.instanceof(Error);
+                expect(e.message).to.equal('File name is required');
+            }
+        });
+
+        it('should throw an error when columns is not an array', function () {
+            try {
+                generator(name, 2, null);
+            } catch (e) {
+                expect(e).to.be.an.instanceof(Error);
+                expect(e.message).to.equal('columns is expected to be an array of string');
+            }
+        });
+
+        it('should throw an error when columns an empty array', function () {
+            try {
+                generator(name, [], null);
+            } catch (e) {
+                expect(e).to.be.an.instanceof(Error);
+                expect(e.message).to.equal('columns must contain at least one entry');
+            }
+        });
+
+        it('should throw an error when options is not a plain object', function () {
+            try {
+                generator(name, columns, null);
+            } catch (e) {
+                expect(e).to.be.an.instanceof(Error);
+                expect(e.message).to.equal('options must be a plain object');
+            }
+        });
+
+        it('should fail with an exception when given a bad row count', function () {
+            try {
+                generator(name, columns, {
+                    silent: true,
+                    rows: -1
+                });
+            } catch (e) {
+                expect(e).to.be.an.instanceof(Error);
+                expect(e.message).to.equal('options.rows must be a positive integer');
+            }
+        });
+
+        it('should fail with an exception when given a bad chunk count', function () {
+            try {
+                generator(name, columns, {
+                    silent: true,
+                    chunks: -1
+                });
+            } catch (e) {
+                expect(e).to.be.an.instanceof(Error);
+                expect(e.message).to.equal('options.chunks must be a positive integer');
+            }
+        });
+
         it('should generate a file', function (done) {
             generator(name, columns, options).then(function () {
                 fs.readFile('foo.csv', (err, data) => {

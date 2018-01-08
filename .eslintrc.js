@@ -10,7 +10,10 @@ module.exports = {
         "promise"
     ],
     "extends": "eslint:recommended",
-    "parserOptions": { "sourceType": "module" },
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaVersion": 2017
+    },
     "rules": {
         "indent": ["error", 4, { "SwitchCase": 1 }],
         "linebreak-style": ["error", "unix"],
@@ -18,7 +21,7 @@ module.exports = {
         "block-scoped-var": ["error"],
         "class-methods-use-this": ["error"],
         "curly": ["error", "all"],
-        "dot-location": ["error", "object"],
+        "dot-location": 0,
         "dot-notation": ["error", { "allowKeywords": false }],
         "eqeqeq": ["error", "always"],
         "no-else-return": ["error"],

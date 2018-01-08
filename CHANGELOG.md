@@ -1,3 +1,6 @@
+### 1.0.3
+* Bumping version for NPM
+
 ### 1.0.2
 * Fixing clerical error in README
 * Bumping node module versions

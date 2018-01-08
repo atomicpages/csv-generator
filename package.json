@@ -1,6 +1,6 @@
 {
     "name": "csv-generator",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "main": "index.js",
     "repository": "https://github.com/atomicpages/csv-generator.git",
     "author": "Dennis Thompson <djtthompson@gmail.com>",
@@ -15,7 +15,7 @@
         "e2e": ""
     },
     "engines": {
-        "node": ">= 4.8.2"
+        "node": ">= 6.10.0"
     },
     "dependencies": {
         "chalk": "^2.0.1",

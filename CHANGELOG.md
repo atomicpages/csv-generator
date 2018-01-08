@@ -1,3 +1,6 @@
+### 1.0.4
+* Dropping support for Node 4
+
 ### 1.0.3
 * Bumping version for NPM
 

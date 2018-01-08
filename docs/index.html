@@ -42,6 +42,165 @@
 
 
 
+    <section>
+        <article><h1>CSV Generator</h1><p><a href="https://travis-ci.org/atomicpages/csv-generator"><img src="https://travis-ci.org/atomicpages/csv-generator.svg?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/github/atomicpages/csv-generator?branch=master"><img src="https://coveralls.io/repos/github/atomicpages/csv-generator/badge.svg?branch=master" alt="Coverage Status"></a> <a href="http://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome"></a></p>
+<p>A simple-to-use script for generating CSV files with hundreds of columns and billions of rows.</p>
+<h3>Installation</h3><p>To install globally:</p>
+<pre class="prettyprint source lang-bash"><code>npm i -g csv-generator # or yarn
+yarn global add csv-generator</code></pre><p>Since the command is on our global path, we can execute via:</p>
+<pre class="prettyprint source lang-bash"><code>gencsv --help</code></pre><p>you can also install locally:</p>
+<pre class="prettyprint source lang-bash"><code>npm i csv-generator
+yarn add csv-generator</code></pre><p>we can run locally:</p>
+<pre class="prettyprint source lang-bash"><code>./node_modules/.bin/gencsv --help</code></pre><p>You can set a soft link to your project root also:</p>
+<pre class="prettyprint source lang-bash"><code>ln -s gencsv ./node_modules/.bin/gencsv
+./gencsv --help</code></pre><h3>Usage</h3><p>You can use this script in three ways:</p>
+<ul>
+<li>Interactive CLI Interface</li>
+<li>CLI Interface</li>
+<li>API (used for embedding in your other scripts/modules)</li>
+</ul>
+<h4>Interactive Interface</h4><p>The interactive interface is a series of questions and answers. This interface is not the default interface for this tool, but we can launch it via:</p>
+<pre class="prettyprint source lang-bash"><code>gencsv --interactive # or
+gencsv -i</code></pre><p>if you want always use the interactive interface, you can save this preference:</p>
+<pre class="prettyprint source lang-bash"><code>gencsv --always-interactive # or
+gencsv -a</code></pre><p>Don't need this interface anymore? No problem:</p>
+<pre class="prettyprint source lang-bash"><code>gencsv --clear-settings # or
+gencsv -c</code></pre><p>You can also run the script after clearing the settings if you wish:</p>
+<pre class="prettyprint source lang-bash"><code>gencsv -c foo.csv &lt; columns.txt</code></pre><h4>CLI Interface</h4><p>Resembling other commands like <code>ls</code>, this is the default feel:</p>
+<pre class="prettyprint source lang-bash"><code>gencsv [options] &lt;file> [columns..]
+gencsv [options] &lt;file> &lt; columns.txt
+
+Commands:
+  &lt;file>  The output file name
+
+Options:
+  --chunk                   The number of rows to generate per pass
+                                                        [number] [default: 1000]
+  --functions, --func       Lists available functions
+  --rows, -r                The number of rows to generate (e.g. 100, 100000,
+                            100k, 1M, 1B, etc.)                   [default: 100]
+  --use-headers, -h         Use this flag to set column headers
+                                                      [boolean] [default: false]
+  --interactive, -i         Run the script in interactive mode with a series of
+                            questions and user-provided answers
+  --always-interactive, -a  Start the script in interactive mode and save this
+                            setting
+  --always-use-headers      Use this flag to persist column headers preferences
+  --clear-settings, -c      Clear always-interactive settings
+  --silent, -s              Minimal console output    [boolean] [default: false]
+  --help                    Show help                                  [boolean]
+  --version                 Show version number                        [boolean]</code></pre><p>We can define our tables two ways:</p>
+<ol>
+<li><p>Manual entry</p>
+<p> When issuing the command, be sure to separate functions by <strong>space</strong> &mdash; other delimiters are not supported with this method of entry.</p>
+<pre class="prettyprint source lang-bash"><code> gencsv foo.csv 'name email ccnumber date(2) pick(a|b)' # quote the argument to avoid escaping
+ gencsv foo.csv name email ccnumber date\(2\) pick\(a\|b\) # or escape special BASH characters</code></pre><p> This will generate a <code>.csv</code> file in our current working directory with five columns and 100 rows.</p>
+<p> Need more rows? Need a lot of rows? No problem.</p>
+<pre class="prettyprint source lang-bash"><code> gencsv foo.csv -r 100K 'name email ccnumber date(2) pick(AWS|Azure|Google Cloud|Digital Ocean)' # or
+ gencsv foo.csv -r 100000 'name email ccnumber date(2) pick(AWS|Azure|Google Cloud|Digital Ocean)'</code></pre><p> Same table, but this time with 100,000 rows!</p>
+<p> Need even more? This script provides additional aliases:</p>
+<ul>
+<li><code>K</code> += 10^3 (e.g. 80K)</li>
+<li><code>M</code> += 10^6 (e.g. 0.2M)</li>
+<li><p><code>B</code> += 10^9 (e.g 2.13B)</p>
+<p>Want to interpolate BASH variables? Use double quotes:</p>
+<pre class="prettyprint source lang-bash"><code>gencsv foo.csv &quot;name email ccnumber date(2) pick($USER|b)&quot;</code></pre></li>
+</ul>
+</li>
+<li><p>Columns definition as plain text</p>
+<p> For wide tables, we can define our column definitions in a separate file:</p>
+<pre class="prettyprint source lang-bash"><code> gencsv foo.csv &lt; columns.txt</code></pre><p> where <code>columns.txt</code> contains:</p>
+<pre class="prettyprint source"><code> name, email, ccnumber, birthday, date, ...</code></pre><p> We can define column headers in <code>columns.txt</code> as well:</p>
+<pre class="prettyprint source"><code> Name, Email Address, Credit Card Number, Birthday, Transaction Date, ...
+ name, email, ccnumber, birthday, date, ...</code></pre></li>
+</ol>
+<h4>API Interface</h4><p>What's that? An API? Yes. As of 1.0.2 you can <code>require</code> <code>csv-generator</code> in your node app:</p>
+<pre class="prettyprint source lang-js"><code>const gencsv = require('csv-generator');
+
+gencsv('foo.csv', ['name'], {
+    rows: 100,
+    chunks: 10,
+    silent: true
+}).then(
+    res => {
+        console.log(res);
+    },
+    e => {
+        console.error(e);
+    }
+);</code></pre><h3>Performance Notes</h3><p>By nature, some functions are considerably slower than others, for example:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Function</th>
+<th style="text-align:center">Time to Write 10K Rows by 100 Columns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>string</code></td>
+<td style="text-align:center">9.481s</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>string(8)</code></td>
+<td style="text-align:center">6.305s</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>alpha</code></td>
+<td style="text-align:center">6.138s</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>alpha(8)</code></td>
+<td style="text-align:center">4.061s</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>sentence</code></td>
+<td style="text-align:center">40.378s</td>
+</tr>
+</tbody>
+</table>
+<p>by contrast, these functions are much faster:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Function</th>
+<th style="text-align:center">Time to Write 10K Rows by 100 Columns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>guid</code></td>
+<td style="text-align:center">1.264s</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>age</code></td>
+<td style="text-align:center">0.72s</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>integer</code></td>
+<td style="text-align:center">0.684s</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>zip</code></td>
+<td style="text-align:center">2.579</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>yn</code></td>
+<td style="text-align:center">0.706s</td>
+</tr>
+</tbody>
+</table>
+<p>If you need to generate large amounts of data for <em>wide</em> tables it is recommended to use fast functions.</p>
+<h4>More Notes</h4><p>Instead of hundreds of async file writes (i.e. page faults), this generator uses a single stream to write content to the file. The trade-off is normal heap space, less CPU involvement, but more virtual memory used &mdash; memory is cheap; transistors aren't.</p>
+<h3>Vendor Copyright Notice</h3><p>This tool uses some scripts that are copyright of <a href="http://www.ddginc-usa.com/">Data Design Group Inc.</a> For more information see the README file in <code>lib/vendor</code>.</p>
+<h3>Developers</h3><p>Want to add a feature? Have a useful generator? Need to debug? The <code>readline</code> interface makes for cumbersome debugging, but node has our back:</p>
+<pre class="prettyprint source lang-bash"><code>node --inspect --inspect-brk index.js</code></pre><p>or if you need to debug the CLI interface:</p>
+<pre class="prettyprint source lang-bash"><code>node --inspect --inspect-brk bin/gencsv foo.csv &lt; columns.txt</code></pre><p>open up Google Chrome and navigate to:</p>
+<pre class="prettyprint source"><code>chrome://inspect</code></pre><h3>Running Tests</h3><p>To run unit tests:</p>
+<pre class="prettyprint source lang-bash"><code>npm run coverage # or
+yarn coverage</code></pre></article>
+    </section>
+
 
 
 
@@ -56,7 +215,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Jan 07 2018 16:38:49 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Jan 07 2018 16:45:39 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>

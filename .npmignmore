@@ -1,3 +1,5 @@
 benchmarks/
 columns.txt
 yarn.lock
+docs/
+coverage/

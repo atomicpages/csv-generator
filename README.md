@@ -204,20 +204,17 @@ If you need to generate large amounts of data for _wide_ tables it is recommende
 #### More Notes
 Instead of hundreds of async file writes (i.e. page faults), this generator uses a single stream to write content to the file. The trade-off is normal heap space, less CPU involvement, but more virtual memory used &mdash; memory is cheap; transistors aren't.
 
-### Vendor Copyright Notice
-This tool uses some scripts that are copyright of [Data Design Group Inc.](http://www.ddginc-usa.com/) For more information see the README file in `lib/vendor`.
-
 ### Developers
 Want to add a feature? Have a useful generator? Need to debug? The `readline` interface makes for cumbersome debugging, but node has our back:
 
 ```bash
-node --inspect --inspect-brk index.js
+node --inspect-brk index.js
 ```
 
 or if you need to debug the CLI interface:
 
 ```bash
-node --inspect --inspect-brk bin/gencsv foo.csv < columns.txt
+node --inspect-brk bin/gencsv foo.csv < columns.txt
 ```
 
 open up Google Chrome and navigate to:

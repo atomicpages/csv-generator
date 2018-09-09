@@ -13,6 +13,21 @@
             "args": ["test/*.test.js"],
             "cwd": "${workspaceRoot}",
             "runtimeExecutable": null
+        },
+        {
+			"type": "node",
+			"request": "launch",
+			"name": "CSV",
+            "program": "${workspaceRoot}/bin/gencsv",
+            "stopOnEntry": false,
+            "args": [
+                "new.csv",
+                "-r 100",
+                "< columns.txt"
+            ],
+            "autoAttachChildProcesses": true,
+            "cwd": "${workspaceRoot}",
+            "runtimeVersion": "9.11.1"
 		}
 	]
 }

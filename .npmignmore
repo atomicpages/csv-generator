@@ -1,5 +1,6 @@
 benchmarks/
 columns.txt
 yarn.lock
+package-lock.json
 docs/
 coverage/

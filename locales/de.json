@@ -1,3 +1,15 @@
 {
-    "The output file name": "Bamboozled again!"
+    "The output file name": "Der Name der Ausgabedatei",
+    "The number of rows to generate per pass": "Die Anzahl der Zeilen, die pro Durchgang generiert werden sollen",
+	"Lists available functions": "Listet verfügbare Funktionen auf",
+	"The number of rows to generate (e.g. 100, 100000, 100k, 1M, 1B, etc.)": "Die Anzahl der zu erzeugenden Zeilen (z. B. 100, 100000, 100k, 1M, 1B usw.)",
+	"Use this flag to set column headers": "Verwenden Sie dieses Flag, um Spaltenüberschriften festzulegen",
+	"Run the script in interactive mode with a series of questions and user-provided answers": "Führen Sie das Skript im interaktiven Modus mit einer Reihe von Fragen und vom Benutzer bereitgestellten Antworten aus",
+	"Start the script in interactive mode and save this setting": "Start the script in interactive mode and save this setting",
+	"Use this flag to persist column headers preferences": "Use this flag to persist column headers preferences",
+	"Clear always-interactive settings": "Clear always-interactive settings",
+	"Minimal console output": "Minimal console output",
+	"You must define an output file name and at least one column definition!": "You must define an output file name and at least one column definition!",
+    "Invalid row number": "Invalid row number",
+    "The number of cores to use": "The number of cores to use"
 }

@@ -1,3 +1,14 @@
+### 2.0.0
+* Setting minimum node version to align with LTS release
+    * Updating travis build to reflect this
+    * Adding node 9 and 10 to travis
+    * Adding `yarn test` to travis scripts
+* Upgrading dependencies
+* General housekeeping
+* Using faker for handle random data generation
+* Deleting checked in dependencies and overhauling CSV generation
+* Improving performance with file partitioning with `cluster`
+
 ### 1.0.3
 * Bumping version for NPM
 

@@ -21,36 +21,6 @@
         .command('<file>', i18n.__('The output file name'))
         .usage('$0 [options] <file> [columns..]\n$0 [options] <file> < columns.txt')
         .options({
-            cores: {
-                describe: i18n.__('The number of cores to use'),
-                number: true,
-                default: os.cpus().length
-            },
-            chunk: {
-                describe: i18n.__('The number of rows to generate per pass'),
-                number: true,
-                default: 1000
-            },
-            functions: {
-                alias: 'func',
-                describe: i18n.__('Lists available functions')
-            },
-            rows: {
-                alias: 'r',
-                describe: i18n.__('The number of rows to generate (e.g. 100, 100000, 100k, 1M, 1B, etc.)'),
-                default: 100
-            },
-            'use-headers': {
-                alias: 'h',
-                describe: i18n.__('Use this flag to set column headers'),
-                boolean: true,
-                default: false
-            },
-            interactive: {
-                alias: 'i',
-                describe: i18n.__('Run the script in interactive mode with a series of questions and user-provided answers'),
-                conflicts: 'clear-settings'
-            },
             'always-interactive': {
                 alias: 'a',
                 describe: i18n.__('Start the script in interactive mode and save this setting'),
@@ -60,13 +30,48 @@
                 describe: i18n.__('Use this flag to persist column headers preferences'),
                 conflicts: 'clear-settings'
             },
+            chunk: {
+                describe: i18n.__('The number of rows to generate per pass'),
+                number: true,
+                default: 1000
+            },
             'clear-settings': {
                 alias: 'c',
                 describe: i18n.__('Clear always-interactive settings')
             },
+            cluster: {
+                describe: i18n.__('Enable cluster mode'),
+                boolean: true,
+                default: true
+            },
+            cores: {
+                describe: i18n.__('The number of cores to use'),
+                number: true,
+                default: os.cpus().length
+            },
+            functions: {
+                alias: 'func',
+                describe: i18n.__('Lists available functions')
+            },
+            interactive: {
+                alias: 'i',
+                describe: i18n.__('Run the script in interactive mode with a series of questions and user-provided answers'),
+                conflicts: 'clear-settings'
+            },
+            rows: {
+                alias: 'r',
+                describe: i18n.__('The number of rows to generate (e.g. 100, 100000, 100k, 1M, 1B, etc.)'),
+                default: 100
+            },
             silent: {
                 alias: 's',
                 describe: i18n.__('Minimal console output'),
+                boolean: true,
+                default: false
+            },
+            'use-headers': {
+                alias: 'h',
+                describe: i18n.__('Use this flag to set column headers'),
                 boolean: true,
                 default: false
             }
@@ -122,21 +127,7 @@
             argv['use-headers'] = true;
         }
 
-        const outFile = argv._[0];
-        let columns = argv._.slice(1);
-
-        if (columns.length === 1) {
-            try {
-                const newCols = columns[0].split(' ');
-
-                if (newCols.length > columns.length) {
-                    columns = newCols;
-                }
-            } catch (e) {
-                console.warn(e);
-            }
-        }
-
+        let [outFile, columns] = argv._;
         let rows = 100;
 
         if (!outFile) {
@@ -154,7 +145,7 @@
             }
         }
 
-        if (columns.length === 0) {
+        if (!columns) {
             let data = '';
 
             const rl = require('readline').createInterface({

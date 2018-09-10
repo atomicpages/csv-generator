@@ -82,23 +82,25 @@ gencsv [options] <file> [columns..]
 gencsv [options] <file> < columns.txt
 
 Commands:
-  <file>  The output file name
+  gencsv <file>  The output file name
 
 Options:
-  --chunk                   The number of rows to generate per pass
-                                                        [number] [default: 1000]
-  --functions, --func       Lists available functions
-  --rows, -r                The number of rows to generate (e.g. 100, 100000,
-                            100k, 1M, 1B, etc.)                   [default: 100]
-  --use-headers, -h         Use this flag to set column headers
-                                                      [boolean] [default: false]
-  --interactive, -i         Run the script in interactive mode with a series of
-                            questions and user-provided answers
   --always-interactive, -a  Start the script in interactive mode and save this
                             setting
   --always-use-headers      Use this flag to persist column headers preferences
+  --chunk                   The number of rows to generate per pass
+                                                        [number] [default: 1000]
   --clear-settings, -c      Clear always-interactive settings
+  --cluster                 Enable cluster mode        [boolean] [default: true]
+  --cores                   The number of cores to use     [number] [default: 8]
+  --functions, --func       Lists available functions
+  --interactive, -i         Run the script in interactive mode with a series of
+                            questions and user-provided answers
+  --rows, -r                The number of rows to generate (e.g. 100, 100000,
+                            100k, 1M, 1B, etc.)                   [default: 100]
   --silent, -s              Minimal console output    [boolean] [default: false]
+  --use-headers, -h         Use this flag to set column headers
+                                                      [boolean] [default: false]
   --help                    Show help                                  [boolean]
   --version                 Show version number                        [boolean]
 ```
@@ -110,8 +112,7 @@ We can define our tables two ways:
     When issuing the command, be sure to separate functions by **space** &mdash; other delimiters are not supported with this method of entry.
 
     ```bash
-    gencsv foo.csv 'name email ccnumber date(2) pick(a|b)' # quote the argument to avoid escaping
-    gencsv foo.csv name email ccnumber date\(2\) pick\(a\|b\) # or escape special BASH characters
+    gencsv foo.csv '{{name.name}}, {{internet.email}}, {{finance.cc}}, {{date.recent}}, {{helpers.randomize(["a", "b"])}}'
     ```
 
     This will generate a `.csv` file in our current working directory with five columns and 100 rows.
@@ -119,22 +120,22 @@ We can define our tables two ways:
     Need more rows? Need a lot of rows? No problem.
 
     ```bash
-    gencsv foo.csv -r 100K 'name email ccnumber date(2) pick(AWS|Azure|Google Cloud|Digital Ocean)' # or
-    gencsv foo.csv -r 100000 'name email ccnumber date(2) pick(AWS|Azure|Google Cloud|Digital Ocean)'
+    gencsv foo.csv -r 100K '{{name.name}}, {{internet.email}}, {{finance.cc}}, {{date.format(null, "dd/mm/yyyy")}}' # or
+    gencsv foo.csv -r 100000 '{{name.name}}, {{internet.email}}, {{finance.cc}}, {{date.format(null, "dd/mm/yyyy")}}'
     ```
 
     Same table, but this time with 100,000 rows!
 
-    Need even more? This script provides additional aliases:
+    More? Go bananas:
 
     * `K` += 10^3 (e.g. 80K)
     * `M` += 10^6 (e.g. 0.2M)
     * `B` += 10^9 (e.g 2.13B)
 
-    Want to interpolate BASH variables? Use double quotes:
+    Need to interpolate shell variables? Honey badger don't care:
 
     ```bash
-    gencsv foo.csv "name email ccnumber date(2) pick($USER|b)"
+    gencsv foo.csv "{{name.name}}, {{internet.email}}, {{finance.cc}}, {{helpers.randomize(['$USER', 'John Doe', 'Jane Doe'])}}"
     ```
 
 2. Columns definition as plain text
@@ -148,18 +149,18 @@ We can define our tables two ways:
     where `columns.txt` contains:
 
     ```
-    name, email, ccnumber, birthday, date, ...
+    {{name.name}}, {{internet.email}}, {{date.dob}}, {{random.ssn}}
     ```
 
     We can define column headers in `columns.txt` as well:
 
     ```
     Name, Email Address, Credit Card Number, Birthday, Transaction Date, ...
-    name, email, ccnumber, birthday, date, ...
+    {{name.name}}, {{internet.email}}, {{finance.cc}}, {{date.dob}}, {{date.recent}}, ...
     ```
 
-#### API Interface
-What's that? An API? Yes. As of 1.0.2 you can `require` `csv-generator` in your node app:
+#### Public CJS API
+Building on top of this technology? Import the `csv-generator` module.
 
 ```js
 const gencsv = require('csv-generator');

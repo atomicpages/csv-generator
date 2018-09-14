@@ -78,7 +78,7 @@ gencsv -c foo.csv < columns.txt
 Resembling other commands like `ls`, this is the default feel:
 
 ```bash
-gencsv [options] <file> [columns..]
+encsv [options] <file> [columns..]
 gencsv [options] <file> < columns.txt
 
 Commands:
@@ -91,11 +91,14 @@ Options:
   --chunk                   The number of rows to generate per pass
                                                         [number] [default: 1000]
   --clear-settings, -c      Clear always-interactive settings
-  --cluster                 Enable cluster mode        [boolean] [default: true]
-  --cores                   The number of cores to use     [number] [default: 8]
+  --cluster                 Enable cluster mode       [boolean] [default: false]
+  --cores                   The number of cores to use. Available cores: 8
+                                                                        [number]
   --functions, --func       Lists available functions
   --interactive, -i         Run the script in interactive mode with a series of
                             questions and user-provided answers
+  --partition               Manually set the partition size if you know what
+                            works for your OS          [string] [default: "16K"]
   --rows, -r                The number of rows to generate (e.g. 100, 100000,
                             100k, 1M, 1B, etc.)                   [default: 100]
   --silent, -s              Minimal console output    [boolean] [default: false]

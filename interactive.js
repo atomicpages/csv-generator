@@ -127,7 +127,7 @@ module.exports = function () {
         Utils.generate(answers.file, answers.columns.split(/\s*,\s*/), {
             rows: Utils.convertNumber(answers.rows),
             chunks: 1000,
-            headers: answers['use-headers'] === 'Yes'
-        }, Array.isArray(answers.headers) ? answers.headers.split(/\s*,\s*/) : []);
+            headers: Array.isArray(answers.headers) ? answers.headers.split(/\s*,\s*/) : [])
+        }
     });
 };

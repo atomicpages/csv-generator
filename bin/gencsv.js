@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 (function () {
     'use strict';
 
@@ -8,6 +6,7 @@
     const i18n = require('i18n');
     const path = require('path');
 
+    const clusterLoader = require('../lib/cluster/loader');
     const Utils = require('../lib/utils');
     const Preferences = require('../lib/preferences');
 
@@ -26,10 +25,6 @@
                 describe: i18n.__('Start the script in interactive mode and save this setting'),
                 conflicts: 'clear-settings'
             },
-            'always-use-headers': {
-                describe: i18n.__('Use this flag to persist column headers preferences'),
-                conflicts: 'clear-settings'
-            },
             chunk: {
                 describe: i18n.__('The number of rows to generate per pass'),
                 number: true,
@@ -42,12 +37,12 @@
             cluster: {
                 describe: i18n.__('Enable cluster mode'),
                 boolean: true,
-                default: true
+                default: false
             },
             cores: {
-                describe: i18n.__('The number of cores to use'),
+                describe: i18n.__('The number of cores to use', { cores: os.cpus().length }),
                 number: true,
-                default: os.cpus().length
+                implies: 'cluster'
             },
             functions: {
                 alias: 'func',
@@ -58,6 +53,11 @@
                 describe: i18n.__('Run the script in interactive mode with a series of questions and user-provided answers'),
                 conflicts: 'clear-settings'
             },
+            partition: {
+                describe: i18n.__('Manually set the partition size if you know what works for your OS'),
+                string: true,
+                default: '16K' // https://nodejs.org/dist/latest-v8.x/docs/api/stream.html#stream_constructor_new_stream_writable_options
+            },
             rows: {
                 alias: 'r',
                 describe: i18n.__('The number of rows to generate (e.g. 100, 100000, 100k, 1M, 1B, etc.)'),
@@ -66,12 +66,6 @@
             silent: {
                 alias: 's',
                 describe: i18n.__('Minimal console output'),
-                boolean: true,
-                default: false
-            },
-            'use-headers': {
-                alias: 'h',
-                describe: i18n.__('Use this flag to set column headers'),
                 boolean: true,
                 default: false
             }
@@ -85,6 +79,11 @@
         yargs.showHelp();
         process.exit(1);
     };
+
+    // handle implication logic
+    if (argv.cluster && !argv.cores) {
+        argv.cores = os.cpus().length;
+    }
 
     if (argv.functions) {
         console.log(`${i18n.__('Available functions')}:`);
@@ -123,10 +122,6 @@
             process.exit(1);
         }
 
-        if (Preferences.alwaysUseHeaders()) {
-            argv['use-headers'] = true;
-        }
-
         let [outFile, columns] = argv._;
         let rows = 100;
 
@@ -138,7 +133,7 @@
 
         if (argv.r !== 100) {
             try {
-                rows = Utils.convertNumber(argv.r);
+                rows = Utils.convertNumber(argv.r.trim());
             } catch (e) {
                 console.log(chalk.redBright(i18n.__('Invalid row number')));
                 process.exit(1);
@@ -179,18 +174,19 @@
                     columns = columns.replace(/\s+\}\}/g, '');
                 }
 
-                Utils.generate(outFile, columns, {
+                clusterLoader(argv, outFile, columns, {
                     rows: rows,
                     chunks: argv.chunk,
-                    headers: argv['use-headers'] || headers.length > 0,
+                    headers: headers.split(/\s*,\s*/),
                     silent: argv.silent
-                }, headers.split(/\s*,\s*/));
+                });
             });
         } else {
-            Utils.generate(outFile, columns, {
+
+            clusterLoader(argv, outFile, columns, {
                 rows: rows,
                 chunks: argv.chunk,
-                headers: argv['use-headers'],
+                headers: null,
                 silent: argv.silent
             });
         }

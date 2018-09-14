@@ -19,12 +19,6 @@ describe('testing preferences class', function () {
         });
     });
 
-    describe('#alwaysUseHeaders', function () {
-        it('should be undefined', function () {
-            expect(Preferences.alwaysUseHeaders()).to.be.false;
-        });
-    });
-
     describe('#file', function () {
         it('should end with .gencsv', function () {
             expect(Preferences.file()).to.have.string('.gencsv');

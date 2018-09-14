@@ -18,9 +18,8 @@
         {
 			"type": "node",
 			"request": "launch",
-			"name": "CSV",
-            "program": "${workspaceRoot}/bin/gencsv",
-            "stopOnEntry": false,
+			"name": "CSV_singlenode",
+            "program": "${workspaceRoot}/bin/gencsv.js",
             "args": [
                 "out.csv",
                 "-r 100",
@@ -29,6 +28,20 @@
             "autoAttachChildProcesses": true,
             "cwd": "${workspaceRoot}",
             "runtimeVersion": "9.11.1"
+        },
+        {
+			"type": "node",
+			"request": "launch",
+            "name": "CSV_cluster",
+            "program": "${workspaceRoot}/bin/gencsv.js",
+            "autoAttachChildProcesses": true,
+            "runtimeVersion": "9.11.1",
+            "args": [
+                "out.csv",
+                "--cluster",
+                "-r 20K",
+                "{{name.name}}"
+            ]
 		}
 	]
 }

@@ -1,11 +1,11 @@
 {
     "name": "csv-generator",
-    "version": "2.0.0-dev.2",
+    "version": "2.0.0-dev.3",
     "main": "index.js",
     "repository": "https://github.com/atomicpages/csv-generator.git",
     "author": "Dennis Thompson <djtthompson@gmail.com>",
     "license": "MIT",
-    "bin": "./bin/gencsv",
+    "bin": "./bin/gencsv.js",
     "preferGlobal": true,
     "scripts": {
         "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
@@ -31,6 +31,7 @@
         "lodash": "^4.17.10",
         "moment": "^2.22.2",
         "progress": "^2.0.0",
+        "uuid": "^3.3.2",
         "yargs": "^12.0.2"
     },
     "devDependencies": {

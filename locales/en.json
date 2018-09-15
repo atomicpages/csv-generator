@@ -14,5 +14,7 @@
 	"Manually set the partition size if you know what works for your OS": "Manually set the partition size if you know what works for your OS",
 	"Columns definitions received! Validating": "Columns definitions received! Validating",
 	"You must define an output file name and at least one column definition!": "You must define an output file name and at least one column definition!",
-	"Invalid row number": "Invalid row number"
+	"Invalid row number": "Invalid row number",
+	"Output file must be defined!": "Output file must be defined!",
+	"Usage": "Usage"
 }

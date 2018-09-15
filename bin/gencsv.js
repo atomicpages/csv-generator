@@ -182,7 +182,6 @@
                 });
             });
         } else {
-
             clusterLoader(argv, outFile, columns, {
                 rows: rows,
                 chunks: argv.chunk,

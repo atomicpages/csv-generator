@@ -28,7 +28,7 @@
         "is-plain-object": "^2.0.4",
         "lodash": "^4.17.5",
         "progress": "^2.0.0",
-        "yargs": "^8.0.2"
+        "yargs": "^16.0.0"
     },
     "devDependencies": {
         "chai": "^4.1.0",

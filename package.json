@@ -24,11 +24,11 @@
         "cli-table": "^0.3.1",
         "figlet": "^1.2.0",
         "i18n": "^0.8.3",
-        "inquirer": "^4.0.2",
+        "inquirer": "^7.0.5",
         "is-plain-object": "^2.0.4",
         "lodash": "^4.17.5",
         "progress": "^2.0.0",
-        "yargs": "^8.0.2"
+        "yargs": "^15.0.1"
     },
     "devDependencies": {
         "chai": "^4.1.0",
